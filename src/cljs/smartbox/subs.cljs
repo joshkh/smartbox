@@ -17,3 +17,8 @@
   :input-identifiers
   (fn [db]
     (reaction (get-in @db [:input :identifiers]))))
+
+(re-frame/register-sub
+  :app-state
+  (fn [db]
+    (reaction @db)))

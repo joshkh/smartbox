@@ -30,6 +30,11 @@
             [:div.identifier {:float "left"
                               :padding "4px"
                               :margin "2px"
-                              :border "1px solid #90BF60"}
-             [:&.pending {:background "#CCCCCC"}]]]
+                              :border "1px solid #EAEAEA"
+                              :border-radius "9px"
+                              :transition "all 0.5s ease"}
+             [:&.pending {:background "#EAEAEA"}]
+             [:&.matched {:background "#9FCC68"
+                          :border "#9FCC68"
+                          :color "white"}]]]
 )

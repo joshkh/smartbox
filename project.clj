@@ -26,7 +26,8 @@
   :cljsbuild {:builds [{:id "dev"
                         :source-paths ["src/cljs"]
 
-                        :figwheel {:on-jsload "smartbox.core/mount-root"}
+                        :figwheel {:on-jsload "smartbox.core/mount-root"
+                                   :server-port "3590"}
 
                         :compiler {:main smartbox.core
                                    :output-to "resources/public/js/compiled/app.js"

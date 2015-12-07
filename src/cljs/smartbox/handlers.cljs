@@ -20,8 +20,22 @@
       (println "current idens" current-identifiers)
       (update-in db [:input :identifiers] conj {:identifier identifier :status "pending"}))))
 
+
+(defn update-match [s searchterm value]
+  (println "update-match: s" s)
+  (println "update-match: searchterm" searchterm)
+  (println "update-match: value" value)
+  (vec (map (fn [item] (if (= searchterm (:identifier item))
+                         (assoc item :status "matched")
+                         item))
+            s)) )
+
 (re-frame/register-handler
-  :talk
-  (fn [db [_ [value]]]
-    (map count (get-in value [:input]))
-    db))
+  :update-identifier
+  (fn [db [_ matches]]
+    (let [test nil]
+      (println (get-in (first matches) [:input]))
+      (last (map (fn [searchterm]
+                    (println "RUNNING")
+                    (update-in db [:input :identifiers] update-match searchterm "matched"))
+                  (get-in (first matches) [:input]))))))

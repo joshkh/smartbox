@@ -9,13 +9,8 @@
 
 (def flymine (js/imjs.Service. (clj->js {:root "www.flymine.org/query"})))
 
-(println flymine)
-
-(defn fprint [value]
-  (println "the value is" value))
 
 (defn resolve-id [id]
-
   (let [id-job-promise (.resolveIds flymine (clj->js {:identifiers [id]
                                                       :type "Gene"
                                                       :extra "D. melanogaster"}))]
@@ -28,11 +23,13 @@
                                      ["MATCH" "DUPLICATE" "OTHER"])
                                 unresolved (.. success -unresolved)]
                             (if-not (empty? matches)
-                              (dispatch [:talk matches]))))))
+                              (dispatch [:update-identifier matches]))))))
 
                (fn [r] (println "FAILED FIRST"))))))
 
-(resolve-id "adh")
+(defn app-state []
+  (let [state (re-frame/subscribe [:app-state])]
+    [:div (str @state)]))
 
 (defn strip-characters
   "Removes one or more characters from a string"
@@ -45,12 +42,15 @@
   (let [val (atom nil)
         reset #(set! (-> % .-target .-value) nil)
         save #(let [v (strip-characters (-> @val str clojure.string/trim) ",; ")]
-               (if-not (empty? v) (dispatch [:add-identifier v])))]
+               (if-not (empty? v)
+                 (do (dispatch [:add-identifier v])
+                     (resolve-id v))))]
     (fn []
       [:input.freeform {:type "text"
                :value @val
                :size (count @val)
                :on-change #(reset! val (-> % .-target .-value))
+              :placeholder "Identifiers..."
                :on-key-down #(case (.-which %)
                               13 (do (save) (reset %))
                               188 (do (save) (reset %))
@@ -59,7 +59,7 @@
                               nil)}])))
 
 (defn identifier [{identifier :identifier status :status}]
-  [:div.identifier.pending identifier])
+  [:div.identifier {:class status} identifier])
 
 (defn smartbox-container []
   "Component: Houses all the identifiers and inputs"
@@ -70,7 +70,8 @@
             [:div.smartbox
              {:on-click focus-textbox}
              (map identifier @input-identifiers)
-             [smartbox-input]]])))
+             [smartbox-input]]
+            [app-state]])))
 
 
 (defn home-panel []
